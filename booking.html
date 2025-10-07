@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Booking - Sunset Beach Resort</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Merienda:wght@300..900&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --primary-color: #003355;
+            --secondary-color: #18b39b;
+            --accent-color: #f34208;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .h-font {
+            font-family: 'Merienda', cursive;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-link {
+            color: rgba(255,255,255,0.85) !important;
+            transition: color 0.3s;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white !important;
+            font-weight: 500;
+        }
+        
+        .capacity-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .date-info-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .date-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .status-available { background-color: #4caf50; }
+        .status-limited { background-color: #ff9800; }
+        .status-full { background-color: #f44336; }
+        
+        input[type="date"]:disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+        
+        .alert-danger {
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Header Placeholder -->
+    <div id="header-placeholder"></div>
+
+    <div class="container my-5">
+        <div class="row mb-3">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb bg-transparent p-0">
+                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                        <li class="breadcrumb-item"><a href="rooms.html">Rooms</a></li>
+                        <li class="breadcrumb-item active">Confirm Booking</li>
+                    </ol>
+                </nav>
+                <h2 class="fw-bold">Confirm Booking</h2>
+            </div>
+        </div>
+
+        <!-- Login Warning (if not logged in) -->
+        <div id="loginWarning" class="alert alert-warning d-none">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Please <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal">login</a> or 
+            <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal">register</a> to complete your booking.
+        </div>
+
+        <div class="row">
+            <!-- Room Details Column -->
+            <div class="col-md-7">
+                <div class="card shadow-sm">
+                    <div id="roomImageContainer"></div>
+                    <div class="card-body">
+                        <h5 class="card-title" id="roomName">Loading...</h5>
+                        <p class="card-text"><strong>₱<span id="roomPrice">0</span></strong> per night</p>
+                        <p class="card-text"><small class="text-muted">Maximum capacity: 5 concurrent bookings</small></p>
+                        <hr>
+                        <h6 class="fw-bold">Facilities</h6>
+                        <div id="roomFacilities" class="mb-3"></div>
+                        
+                        <!-- Date Availability Info -->
+                        <div class="date-info-box">
+                            <h6><i class="bi bi-info-circle me-2"></i>Booking Availability</h6>
+                            <div class="date-status">
+                                <span class="status-indicator status-available"></span>
+                                <small>Available dates</small>
+                            </div>
+                            <div class="date-status">
+                                <span class="status-indicator status-full"></span>
+                                <small>Fully booked (cannot be selected)</small>
+                            </div>
+                            <p class="mb-0 mt-3"><strong>Note:</strong> Past dates and fully booked dates cannot be selected.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Form Column -->
+            <div class="col-md-5">
+                <div class="card p-4 shadow-sm">
+                    <h5 class="mb-4">Booking Details</h5>
+
+                    <!-- Capacity Warning -->
+                    <div id="capacityAlert" class="capacity-warning d-none">
+                        <strong>⚠️ Dates Not Available:</strong>
+                        <p class="mb-0 mt-2">Selected dates are fully booked. Please choose different dates.</p>
+                    </div>
+
+                    <form id="mainBookingForm">
+                        <input type="hidden" id="bookingRoomId">
+
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" name="name" class="form-control shadow-none" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" name="phone" class="form-control shadow-none" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <textarea name="address" class="form-control shadow-none" rows="2" readonly></textarea>
+                        </div>
+
+                        <div class="row gx-2">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Check-in <span class="text-danger">*</span></label>
+                                <input type="date" name="checkin" id="mainCheckin" class="form-control shadow-none" required>
+                                <small class="text-muted">No past dates allowed</small>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Check-out <span class="text-danger">*</span></label>
+                                <input type="date" name="checkout" id="mainCheckout" class="form-control shadow-none" required>
+                                <small class="text-muted">After check-in only</small>
+                            </div>
+                        </div>
+
+                        <div class="row gx-2">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Adults</label>
+                                <select name="adults" class="form-select shadow-none">
+                                    <option value="1">1</option>
+                                    <option value="2" selected>2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                </select>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Children</label>
+                                <select name="children" class="form-select shadow-none">
+                                    <option value="0" selected>0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 p-3 bg-light rounded">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Number of Nights:</span>
+                                <strong id="mainNights">0</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Price per Night:</span>
+                                <strong>₱<span id="mainPricePerNight">0</span></strong>
+                            </div>
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="mb-0">Total:</h6>
+                                <h6 class="text-primary mb-0">₱<span id="mainTotal">0.00</span></h6>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-success" onclick="processGCashPayment()" id="gcashBtn">
+                                <i class="bi bi-wallet2 me-2"></i>Pay with GCash
+                            </button>
+                            <button type="button" class="btn btn-info" onclick="processPayMayaPayment()" id="paymayaBtn">
+                                <i class="bi bi-credit-card me-2"></i>Pay with PayMaya
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="loadComponents.js"></script>
+    <script src="app.js"></script>
+    <script>
+        const roomsData = [
+            {id: 1, name: 'Alcala Regular', price: 1499, capacity: 5, image: 'images/rooms/1.jpg', facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service']},
+            {id: 2, name: 'Justine Regular', price: 1999, capacity: 5, image: 'images/rooms/2.png', facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service']},
+            {id: 3, name: 'Xu Regular', price: 2999, capacity: 5, image: 'images/rooms/3.png', facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service']},
+            {id: 4, name: 'Lafuente Regular', price: 3499, capacity: 5, image: 'images/rooms/4.png', facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service']},
+            {id: 5, name: 'Alcala Villa', price: 4999, capacity: 5, image: 'images/rooms/alcalavilla.png', facilities: ['Wifi', 'Television', 'Breakfast', 'Swimming Pool']},
+            {id: 6, name: 'Justine Villa', price: 7999, capacity: 5, image: 'images/rooms/xuvilla.png', facilities: ['Wifi', 'Television', 'Breakfast', 'Swimming Pool']},
+            {id: 7, name: 'Xu Villa', price: 8999, capacity: 5, image: 'images/rooms/110.png', facilities: ['Wifi', 'Television', 'Breakfast', 'Swimming Pool', 'Spa']},
+            {id: 8, name: 'Lafuente Villa', price: 9999, capacity: 5, image: 'images/rooms/laf.png', facilities: ['Wifi', 'Television', 'Breakfast', 'Swimming Pool', 'Spa', 'Gym']},
+        ];
+
+        let blockedDates = [];
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = parseInt(urlParams.get('room_id')) || 1;
+        let selectedRoom = roomsData.find(r => r.id === roomId) || roomsData[0];
+
+        // Load blocked dates for this room
+        async function loadBlockedDates() {
+            try {
+                const result = await apiCall(`bookings.php?action=getBlockedDates&roomId=${roomId}`);
+                if (result.success) {
+                    blockedDates = result.data.blockedDates || [];
+                    console.log('Blocked dates loaded:', blockedDates);
+                }
+            } catch (error) {
+                console.error('Error loading blocked dates:', error);
+            }
+        }
+
+        function isDateBlocked(dateString) {
+            return blockedDates.includes(dateString);
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadBlockedDates();
+            loadRoomDetails();
+            checkUserLogin();
+            setupEventListeners();
+        });
+
+        function loadRoomDetails() {
+            const imageContainer = document.getElementById('roomImageContainer');
+            imageContainer.innerHTML = `<img src="${selectedRoom.image}" alt="${selectedRoom.name}" style="width: 100%; height: 400px; object-fit: cover; border-radius: 8px 8px 0 0;">`;
+
+            document.getElementById('roomName').textContent = selectedRoom.name;
+            document.getElementById('roomPrice').textContent = selectedRoom.price.toLocaleString();
+            document.getElementById('mainPricePerNight').textContent = selectedRoom.price.toLocaleString();
+            document.getElementById('bookingRoomId').value = selectedRoom.id;
+
+            const facilitiesHtml = selectedRoom.facilities
+                .map(f => `<span class="badge bg-light text-dark me-1 mb-1"><i class="bi bi-check-circle me-1"></i>${f}</span>`)
+                .join('');
+            document.getElementById('roomFacilities').innerHTML = facilitiesHtml;
+        }
+
+        function checkUserLogin() {
+            if (window.currentUser) {
+                const form = document.getElementById('mainBookingForm');
+                const loginWarning = document.getElementById('loginWarning');
+
+                loginWarning.classList.add('d-none');
+                form.querySelector('[name="name"]').value = window.currentUser.name;
+                form.querySelector('[name="phone"]').value = window.currentUser.phone;
+                form.querySelector('[name="address"]').value = window.currentUser.address;
+            } else {
+                document.getElementById('loginWarning').classList.remove('d-none');
+            }
+        }
+
+        function setupEventListeners() {
+            const today = new Date().toISOString().split('T')[0];
+            const checkinInput = document.getElementById('mainCheckin');
+            const checkoutInput = document.getElementById('mainCheckout');
+            
+            checkinInput.min = today;
+            checkoutInput.min = today;
+
+            checkinInput.addEventListener('change', function() {
+                const selectedDate = this.value;
+                
+                if (isDateBlocked(selectedDate)) {
+                    showAlert('danger', 'This check-in date is fully booked! Please select another date.');
+                    this.value = '';
+                    return;
+                }
+                
+                checkoutInput.min = this.value;
+                calculateMainBooking();
+            });
+            
+            checkoutInput.addEventListener('change', calculateMainBooking);
+        }
+
+        async function calculateMainBooking() {
+            const checkin = document.getElementById('mainCheckin').value;
+            const checkout = document.getElementById('mainCheckout').value;
+
+            if (!checkin || !checkout) {
+                document.getElementById('mainNights').textContent = '0';
+                document.getElementById('mainTotal').textContent = '0.00';
+                return;
+            }
+
+            const d1 = new Date(checkin);
+            const d2 = new Date(checkout);
+            const nights = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24));
+
+            if (nights > 0) {
+                // Check if any dates in range are blocked
+                let hasBlockedDate = false;
+                let blockedDatesList = [];
+                
+                for (let d = new Date(d1); d < d2; d.setDate(d.getDate() + 1)) {
+                    const dateStr = d.toISOString().split('T')[0];
+                    if (isDateBlocked(dateStr)) {
+                        hasBlockedDate = true;
+                        blockedDatesList.push(new Date(dateStr).toLocaleDateString());
+                    }
+                }
+                
+                const capacityAlert = document.getElementById('capacityAlert');
+                const gcashBtn = document.getElementById('gcashBtn');
+                const paymayaBtn = document.getElementById('paymayaBtn');
+                
+                if (hasBlockedDate) {
+                    capacityAlert.classList.remove('d-none');
+                    capacityAlert.innerHTML = `
+                        <strong>⚠️ Booking Not Available</strong>
+                        <p class="mb-2 mt-2">The following dates are fully booked:</p>
+                        <ul class="mb-2">
+                            ${blockedDatesList.map(d => `<li>${d}</li>`).join('')}
+                        </ul>
+                        <p class="mb-0"><strong>Please select different dates to proceed with booking.</strong></p>
+                    `;
+                    gcashBtn.disabled = true;
+                    paymayaBtn.disabled = true;
+                    
+                    document.getElementById('mainNights').textContent = '0';
+                    document.getElementById('mainTotal').textContent = '0.00';
+                } else {
+                    capacityAlert.classList.add('d-none');
+                    gcashBtn.disabled = false;
+                    paymayaBtn.disabled = false;
+                    
+                    document.getElementById('mainNights').textContent = nights;
+                    const total = nights * selectedRoom.price;
+                    document.getElementById('mainTotal').textContent = total.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+            } else {
+                document.getElementById('mainNights').textContent = '0';
+                document.getElementById('mainTotal').textContent = '0.00';
+                document.getElementById('capacityAlert').classList.add('d-none');
+            }
+        }
+
+        function processGCashPayment() {
+            processMainPayment('GCash');
+        }
+
+        function processPayMayaPayment() {
+            processMainPayment('PayMaya');
+        }
+
+        async function processMainPayment(provider) {
+            if (!window.currentUser) {
+                showAlert('warning', 'Please login first to complete your booking');
+                return;
+            }
+
+            const form = document.getElementById('mainBookingForm');
+            const checkin = document.getElementById('mainCheckin').value;
+            const checkout = document.getElementById('mainCheckout').value;
+            const nights = parseInt(document.getElementById('mainNights').textContent);
+            const totalAmount = parseFloat(document.getElementById('mainTotal').textContent.replace(/,/g, ''));
+
+            if (!checkin || !checkout) {
+                showAlert('warning', 'Please select check-in and check-out dates');
+                return;
+            }
+
+            if (nights <= 0) {
+                showAlert('warning', 'Please select valid dates (at least 1 night)');
+                return;
+            }
+
+            // Final check for blocked dates
+            const d1 = new Date(checkin);
+            const d2 = new Date(checkout);
+            let hasBlockedDate = false;
+            
+            for (let d = new Date(d1); d < d2; d.setDate(d.getDate() + 1)) {
+                const dateStr = d.toISOString().split('T')[0];
+                if (isDateBlocked(dateStr)) {
+                    hasBlockedDate = true;
+                    break;
+                }
+            }
+            
+            if (hasBlockedDate) {
+                showAlert('danger', 'Cannot proceed: Selected dates include fully booked dates. Please choose different dates.');
+                return;
+            }
+
+            const adults = parseInt(form.querySelector('[name="adults"]').value);
+            const children = parseInt(form.querySelector('[name="children"]').value);
+
+            // Build payment URL
+            const paymentUrl = provider === 'GCash' ? 'gcash.php' : 'paymaya.php';
+            const params = new URLSearchParams({
+                room_id: selectedRoom.id,
+                checkin: checkin,
+                checkout: checkout,
+                adults: adults,
+                children: children,
+                price: selectedRoom.price,
+                nights: nights,
+                provider: provider
+            });
+
+            // Open payment window
+            const width = 600;
+            const height = 800;
+            const left = (screen.width - width) / 2;
+            const top = (screen.height - height) / 2;
+            
+            window.open(
+                `${paymentUrl}?${params.toString()}`,
+                'PaymentWindow',
+                `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+            );
+        }
+
+        function showAlert(type, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 80px; right: 20px; z-index: 9999; min-width: 300px; max-width: 500px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+    </script>
+</body>
+</html>

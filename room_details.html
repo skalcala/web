@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Details - Sunset Beach Resort</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Merienda:wght@300..900&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <style>
+        :root {
+            --primary-color: #003355;
+            --secondary-color: #18b39b;
+            --accent-color: #f34208;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .h-font {
+            font-family: 'Merienda', cursive;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-link {
+            color: rgba(255,255,255,0.85) !important;
+        }
+        
+        .room-image {
+            height: 420px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        
+        .detail-card {
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        }
+        
+        .star {
+            color: #ffc107;
+        }
+        
+        .badge {
+            padding: 8px 12px;
+            font-weight: 500;
+        }
+        
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            background-color: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            padding: 20px;
+        }
+        
+        .review-card {
+            border-left: 4px solid var(--secondary-color);
+            padding: 16px;
+            margin-bottom: 16px;
+            background: #f8f9fa;
+        }
+        
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            margin-top: 60px;
+        }
+        
+        footer a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div id="header-placeholder"></div>
+
+    <div class="container my-5">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="index.html#rooms">Rooms</a></li>
+                <li class="breadcrumb-item active" id="breadcrumbRoom">Room Details</li>
+            </ol>
+        </nav>
+
+        <div class="row mb-3">
+            <div class="col-12">
+                <h2 class="fw-bold h-font" id="roomTitle">Loading...</h2>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Image Carousel -->
+            <div class="col-lg-7">
+                <div id="roomCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <div id="roomImageContainer" class="room-image d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <h3 class="text-white">Room Image</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Room Details Card -->
+            <div class="col-lg-5">
+                <div class="p-4 bg-white detail-card">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h3 class="mb-1" id="roomPrice">₱0 per night</h3>
+                            <div id="roomRating"></div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="fw-bold">Features</h6>
+                    <div class="mb-3" id="roomFeatures"></div>
+
+                    <h6 class="fw-bold">Facilities</h6>
+                    <div class="mb-3" id="roomFacilities"></div>
+
+                    <h6 class="fw-bold">Capacity</h6>
+                    <div class="mb-3">
+                        <span class="badge bg-light text-dark">Up to 5 bookings</span>
+                    </div>
+
+                    <button class="btn btn-success w-100 mb-2" id="bookNowBtn" style="background-color:#18b39b; border-color:#18b39b;">
+                        <i class="bi bi-calendar-check me-2"></i>Book Now
+                    </button>
+                    <a href="index.html" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Rooms
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description Section -->
+        <div class="row my-4">
+            <div class="col-12">
+                <div class="bg-white p-4 rounded shadow-sm">
+                    <h5 class="fw-bold mb-3">Description</h5>
+                    <p id="roomDescription" class="mb-0"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="row my-4">
+            <div class="col-12">
+                <div class="bg-white p-4 rounded shadow-sm">
+                    <h5 class="fw-bold mb-3">Guest Reviews</h5>
+                    <div id="roomReviews"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-3">
+                    <h3 class="h-font fw-bold mb-3">SUNSET BEACH RESORT AND HOTEL</h3>
+                    <p>Experience the ultimate beachfront getaway where luxury meets tranquility.</p>
+                </div>
+                <div class="col-lg-4 mb-3">
+                    <h5 class="mb-3">Contact</h5>
+                    <p class="mb-1"><i class="bi bi-telephone-fill me-2"></i>+63 9123456789</p>
+                    <p class="mb-1"><i class="bi bi-envelope-fill me-2"></i>sbeachresortandhotel@gmail.com</p>
+                </div>
+                <div class="col-lg-4 mb-3">
+                    <h5 class="mb-3">Follow Us</h5>
+                    <a href="#" class="d-block mb-2"><i class="bi bi-facebook me-2"></i>Facebook</a>
+                    <a href="#" class="d-block mb-2"><i class="bi bi-instagram me-2"></i>Instagram</a>
+                    <a href="#" class="d-block mb-2"><i class="bi bi-twitter me-2"></i>Twitter</a>
+                </div>
+            </div>
+        </div>
+        <div class="text-center pt-3 border-top border-light">
+            <p class="mb-0">&copy; 2025 Sunset Beach Resort & Hotel. All rights reserved.</p>
+        </div>
+    </footer>
+
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="loadComponents.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // Room data
+        const rooms = [
+            {
+                id: 1, 
+                name: 'Alcala Regular', 
+                price: 1499, 
+                capacity: 5, 
+                gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
+                facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service'],
+                features: ['1 Room', '1 Bathroom', '1 Balcony', '1 Sofa', '1 Kitchen'],
+                description: 'Cozy regular room with all basic amenities, comfortable for families and couples. Perfect for a relaxing beach vacation with modern conveniences.',
+                reviews: [
+                    {author: 'Maria Santos', rating: 5, text: 'Clean room and friendly staff. Great value for money!'},
+                    {author: 'John Dela Cruz', rating: 4, text: 'Nice location and comfy bed. Would stay here again.'}
+                ]
+            },
+            {
+                id: 2, 
+                name: 'Justine Regular', 
+                price: 1999, 
+                capacity: 5, 
+                gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', 
+                facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service'],
+                features: ['1 Room', '1 Bathroom', '1 Balcony', '1 Sofa', '1 Kitchen'],
+                description: 'Comfortable regular room with modern facilities and pleasant views. Ideal for couples seeking a romantic getaway.',
+                reviews: [
+                    {author: 'Alex Reyes', rating: 4, text: 'Good service, room was spotless and well-maintained.'}
+                ]
+            },
+            {
+                id: 3, 
+                name: 'Xu Regular', 
+                price: 2999, 
+                capacity: 5, 
+                gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', 
+                facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service'],
+                features: ['1 Room', '1 Bathroom', '1 Balcony', '1 Sofa', '1 Kitchen'],
+                description: 'Spacious regular room with premium services and excellent location. Features modern design and breathtaking ocean views.',
+                reviews: [
+                    {author: 'Liza Garcia', rating: 5, text: 'Amazing stay – highly recommended for families!'},
+                    {author: 'Mark Torres', rating: 5, text: 'Elegant room and great breakfast selection.'}
+                ]
+            },
+            {
+                id: 4, 
+                name: 'Lafuente Regular', 
+                price: 3499, 
+                capacity: 5, 
+                gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', 
+                facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service'],
+                features: ['1 Room', '1 Bathroom', '1 Balcony', '1 Sofa', '1 Kitchen'],
+                description: 'Classic regular room with comfortable amenities and warm decor. Perfect blend of comfort and style.',
+                reviews: [
+                    {author: 'Ben Ramos', rating: 4, text: 'Spacious and quiet. Perfect for relaxation.'}
+                ]
+            },
+            {
+                id: 5, 
+                name: 'Alcala Villa', 
+                price: 4999, 
+                capacity: 5, 
+                gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', 
+                facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service', 'Swimming Pool'],
+                features: ['Private Pool', '3 Bedrooms', '2 Bathrooms', 'Kitchen', 'Living Room'],
+                description: 'Luxury villa with private pool and spacious living area – perfect for groups. Enjoy exclusive amenities and stunning surroundings.',
+                reviews: [
+                    {author: 'Sophie Cruz', rating: 5, text: 'We had a fantastic family vacation in this villa!'}
+                ]
+            },
+            {
+                id: 6, 
+                name: 'Justine Villa', 
+                price: 7999, 
+                capacity: 5, 
+                gradient: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', 
+                facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service', 'Swimming Pool'],
+                features: ['Private Pool', '4 Bedrooms', '3 Bathrooms', 'Kitchen', 'Living Room'],
+                description: 'Premium villa with elegant interiors and modern facilities. Experience luxury living with breathtaking views.',
+                reviews: [
+                    {author: 'Ivy Gonzales', rating: 5, text: 'Spacious and luxurious, superb amenities throughout.'}
+                ]
+            },
+            {
+                id: 7, 
+                name: 'Xu Villa', 
+                price: 8999, 
+                capacity: 5, 
+                gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', 
+                facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service', 'Swimming Pool', 'Spa'],
+                features: ['Private Pool', 'Spa', 'Gym', '5 Bedrooms', '4 Bathrooms'],
+                description: 'Ultra-luxury villa with private spa and gym. The pinnacle of comfort and elegance.',
+                reviews: [
+                    {author: 'Oliver Mendoza', rating: 5, text: 'Top-notch experience and great staff service!'}
+                ]
+            },
+            {
+                id: 8, 
+                name: 'Lafuente Villa', 
+                price: 9999, 
+                capacity: 5, 
+                gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)', 
+                facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service', 'Swimming Pool', 'Spa', 'Gym'],
+                features: ['Private Pool', 'Spa', 'Gym', 'Conference Room', '6 Bedrooms'],
+                description: 'Signature villa offering top-tier amenities for corporate and family stays. Ultimate luxury with unparalleled service.',
+                reviews: [
+                    {author: 'Natalie Aquino', rating: 5, text: 'Perfect for our corporate retreat. Exceeded expectations!'}
+                ]
+            }
+        ];
+
+        // Get room ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = parseInt(urlParams.get('id')) || 1;
+        const room = rooms.find(r => r.id === roomId) || rooms[0];
+
+        // Populate room details
+        document.getElementById('breadcrumbRoom').textContent = room.name;
+        document.getElementById('roomTitle').textContent = room.name;
+        document.getElementById('roomPrice').textContent = `₱${room.price.toLocaleString()} per night`;
+        
+        // Set room image
+        const imageContainer = document.getElementById('roomImageContainer');
+        imageContainer.style.background = room.gradient;
+        imageContainer.innerHTML = `<div class="text-center"><h2 class="text-white">${room.name}</h2><p class="text-white">Premium Accommodation</p></div>`;
+
+        // Rating stars
+        let starsHtml = '';
+        for(let i = 0; i < 5; i++) {
+            starsHtml += '<i class="bi bi-star-fill star"></i>';
+        }
+        document.getElementById('roomRating').innerHTML = starsHtml;
+
+        // Features
+        document.getElementById('roomFeatures').innerHTML = room.features
+            .map(f => `<span class="badge rounded-pill bg-light text-dark me-1 mb-1"><i class="bi bi-check-circle me-1"></i>${f}</span>`)
+            .join('');
+
+        // Facilities
+        document.getElementById('roomFacilities').innerHTML = room.facilities
+            .map(f => `<span class="badge rounded-pill bg-light text-dark me-1 mb-1"><i class="bi bi-check-circle me-1"></i>${f}</span>`)
+            .join('');
+
+        // Description
+        document.getElementById('roomDescription').textContent = room.description;
+
+        // Reviews
+        const reviewsHtml = room.reviews.map(review => {
+            let reviewStars = '';
+            for(let i = 0; i < review.rating; i++) {
+                reviewStars += '<i class="bi bi-star-fill star"></i>';
+            }
+            return `
+                <div class="review-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <strong>${review.author}</strong>
+                        <div>${reviewStars}</div>
+                    </div>
+                    <p class="mb-0 text-muted">${review.text}</p>
+                </div>
+            `;
+        }).join('');
+        document.getElementById('roomReviews').innerHTML = reviewsHtml || '<p class="text-muted">No reviews yet. Be the first to review!</p>';
+
+        // Book Now button - redirect to main page and open booking modal
+        document.getElementById('bookNowBtn').addEventListener('click', function() {
+            localStorage.setItem('bookRoomId', roomId);
+            window.location.href = 'index.html?openBooking=true';
+        });
+    </script>
+</body>
+</html>

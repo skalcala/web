@@ -1,0 +1,311 @@
+<!-- Navigation Header with Login/Register -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container-fluid px-lg-4">
+        <a class="navbar-brand d-flex align-items-center" href="index.html">
+            <img src="images/logo.png" alt="Logo" width="70" height="70" class="me-3">
+            <div>
+                    <span class="h-font fw-bold fs-3" style="color:#fff;">SUNSET</span><br>
+                    <span class="fs-5" style="color:#fff;">BEACH RESORT AND HOTEL</span>
+                </div>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html" id="nav-home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="rooms.html" id="nav-rooms">Rooms</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="services.html" id="nav-services">Services</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="contact.html" id="nav-contact">Contact Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="about.html" id="nav-about">About Us</a>
+                </li>
+            </ul>
+            
+            <!-- Login/Register Buttons (shown when not logged in) -->
+            <div id="authButtons" class="d-flex ms-3">
+                <button type="button" class="btn btn-outline-light shadow-none me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
+                    <i class="bi bi-person-circle me-1"></i> Login
+                </button>
+                <button type="button" class="btn btn-outline-light shadow-none" data-bs-toggle="modal" data-bs-target="#registerModal">
+                    <i class="bi bi-person-plus me-1"></i> Register
+                </button>
+            </div>
+            
+            <!-- User Dropdown (shown when logged in) -->
+            <div id="userDropdown" class="dropdown ms-3 d-none">
+                <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle me-1"></i> <span id="navUserName"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
+                        <i class="bi bi-person me-2"></i>Profile
+                    </a></li>
+                    <li><a class="dropdown-item" href="#" id="myBookingsBtn">
+                        <i class="bi bi-calendar-check me-2"></i>My Bookings
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#" id="navLogoutBtn">
+                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="loginForm">
+                <div class="modal-header" style="background-color: #003355; color: white;">
+                    <h5 class="modal-title d-flex align-items-center">
+                        <i class="bi bi-person-circle fs-3 me-2"></i> User Login
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Email address</label>
+                        <input type="email" name="email" class="form-control shadow-none" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control shadow-none" required>
+                    </div>
+                    <button type="submit" class="btn w-100 text-white shadow-none" style="background-color: #003355;">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Register Modal -->
+<div class="modal fade" id="registerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="registerForm">
+                <div class="modal-header" style="background-color: #003355; color: white;">
+                    <h5 class="modal-title d-flex align-items-center">
+                        <i class="bi bi-person-lines-fill fs-3 me-2"></i> User Registration
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <span class="badge rounded-pill bg-light text-dark mb-3 text-wrap lh-base">
+                        Note: Your details must match with your ID for check-in verification.
+                    </span>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Name</label>
+                                <input type="text" name="name" id="regName" class="form-control shadow-none" required pattern="[A-Za-z\s]+" title="Letters only">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" id="regEmail" class="form-control shadow-none" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" name="phone" id="regPhone" class="form-control shadow-none" required pattern="[0-9]{10,11}" title="10-11 digits">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" name="dob" id="regDOB" class="form-control shadow-none" required>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Address</label>
+                                <textarea name="address" id="regAddress" class="form-control shadow-none" rows="2" required></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Password</label>
+                                <input type="password" name="password" id="regPassword" class="form-control shadow-none" required minlength="6">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Confirm Password</label>
+                                <input type="password" name="cpassword" id="regCPassword" class="form-control shadow-none" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center my-1">
+                        <button type="submit" class="btn text-white shadow-none" style="background-color: #003355;">Register</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #003355; color: white;">
+                <h5 class="modal-title"><i class="bi bi-person-circle me-2"></i>Profile</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="profileContent">
+                    <p><strong>Name:</strong> <span id="profileName"></span></p>
+                    <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+                    <p><strong>Phone:</strong> <span id="profilePhone"></span></p>
+                    <p><strong>Address:</strong> <span id="profileAddress"></span></p>
+                    <p><strong>Date of Birth:</strong> <span id="profileDOB"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- My Bookings Modal -->
+<div class="modal fade" id="bookingsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #003355; color: white;">
+                <h5 class="modal-title"><i class="bi bi-calendar-check me-2"></i>My Bookings</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="bookingsContent" class="table-responsive">
+                    <!-- Bookings will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #003355; color: white;">
+                <h5 class="modal-title">
+                    <i class="bi bi-calendar-check me-2"></i>Book Room: <span id="bookingRoomName"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="bookingLoginWarning" class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Please <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" onclick="closeBookingModal()">login</a> or 
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" onclick="closeBookingModal()">register</a> to make a booking.
+                </div>
+                
+                <div id="capacityWarning" class="capacity-warning d-none">
+                    <strong>⚠️ Capacity Alert:</strong>
+                    <p class="mb-0 mt-1">This room is fully booked for the selected dates. Your booking will be queued.</p>
+                </div>
+                
+                <form id="bookingForm" class="d-none">
+                    <input type="hidden" id="selectedRoomId">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Name</label>
+                            <input type="text" name="name" class="form-control shadow-none" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" name="phone" class="form-control shadow-none" readonly>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Address</label>
+                            <textarea name="address" class="form-control shadow-none" rows="2" readonly></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Check-in</label>
+                            <input type="date" name="checkin" id="bookingCheckin" class="form-control shadow-none" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Check-out</label>
+                            <input type="date" name="checkout" id="bookingCheckout" class="form-control shadow-none" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Adults</label>
+                            <select name="adults" class="form-select shadow-none">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Children</label>
+                            <select name="children" class="form-select shadow-none">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Number of Nights:</span>
+                            <strong id="nightsCount">0</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Price per Night:</span>
+                            <strong>₱<span id="pricePerNight">0</span></strong>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <h5>Total:</h5>
+                            <h5 class="text-primary">₱<span id="totalPrice">0.00</span></h5>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="button" class="btn btn-success" onclick="processGCashPayment()">
+                            <i class="bi bi-wallet2 me-2"></i>Pay with GCash
+                        </button>
+                        <button type="button" class="btn btn-info" onclick="processPayMayaPayment()">
+                            <i class="bi bi-credit-card me-2"></i>Pay with PayMaya
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Set active navigation based on current page
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const navLinks = {
+        'index.html': 'nav-home',
+        'rooms.html': 'nav-rooms',
+        'services.html': 'nav-services',
+        'contact.html': 'nav-contact',
+        'about.html': 'nav-about',
+        'room_details.html': 'nav-rooms'
+    };
+    
+    const activeNavId = navLinks[currentPage];
+    if (activeNavId) {
+        const activeLink = document.getElementById(activeNavId);
+        if (activeLink) {
+            activeLink.classList.add('active');
+        }
+    }
+});
+
+function closeBookingModal() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('bookingModal'));
+    if (modal) modal.hide();
+}
+</script>

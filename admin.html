@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue Management - Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --primary-color: #003355;
+            --secondary-color: #18b39b;
+            --accent-color: #f34208;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--primary-color) 0%, #004466 100%);
+            color: white;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .stat-card {
+            border-left: 4px solid var(--secondary-color);
+            transition: transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .queue-badge {
+            font-size: 0.9rem;
+            padding: 6px 12px;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+        
+        .status-confirmed { color: #28a745; }
+        .status-queued { color: #ffc107; }
+        .status-cancelled { color: #dc3545; }
+        
+        .action-btn {
+            padding: 4px 8px;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar p-0">
+                <div class="p-4">
+                    <h4 class="mb-4"><i class="bi bi-gear-fill me-2"></i>Admin Panel</h4>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#dashboard">
+                                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#bookings">
+                                <i class="bi bi-calendar-check me-2"></i>All Bookings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#queue">
+                                <i class="bi bi-list-ol me-2"></i>Queue Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#rooms">
+                                <i class="bi bi-door-open me-2"></i>Room Status
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="bi bi-list-columns me-2"></i>Queue Management Dashboard</h2>
+                    <button class="btn btn-primary" onclick="refreshData()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+                    </button>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card stat-card shadow-sm">
+                            <div class="card-body">
+                                <h6 class="text-muted">Total Bookings</h6>
+                                <h3 id="totalBookings">0</h3>
+                                <small class="text-muted">All time</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card shadow-sm">
+                            <div class="card-body">
+                                <h6 class="text-muted">Confirmed</h6>
+                                <h3 id="confirmedBookings" class="status-confirmed">0</h3>
+                                <small class="text-muted">Active bookings</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card shadow-sm">
+                            <div class="card-body">
+                                <h6 class="text-muted">In Queue</h6>
+                                <h3 id="queuedBookings" class="status-queued">0</h3>
+                                <small class="text-muted">Waiting for confirmation</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card shadow-sm">
+                            <div class="card-body">
+                                <h6 class="text-muted">Cancelled</h6>
+                                <h3 id="cancelledBookings" class="status-cancelled">0</h3>
+                                <small class="text-muted">Last 30 days</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room Capacity Overview -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-door-closed me-2"></i>Room Capacity Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="roomCapacityContainer" class="row"></div>
+                    </div>
+                </div>
+
+                <!-- Queue Management Table -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-list-ol me-2"></i>Current Queue</h5>
+                        <div>
+                            <select id="filterRoom" class="form-select form-select-sm" onchange="filterQueue()">
+                                <option value="">All Rooms</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Booking ID</th>
+                                        <th>Guest Name</th>
+                                        <th>Room</th>
+                                        <th>Check-in</th>
+                                        <th>Check-out</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="queueTableBody">
+                                    <tr>
+                                        <td colspan="8" class="text-center">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Bookings Table -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Recent Bookings</h5>
+                        <div>
+                            <select id="filterStatus" class="form-select form-select-sm" onchange="filterBookings()">
+                                <option value="">All Status</option>
+                                <option value="Confirmed">Confirmed</option>
+                                <option value="Queued">Queued</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Booking ID</th>
+                                        <th>Guest</th>
+                                        <th>Room</th>
+                                        <th>Dates</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bookingsTableBody">
+                                    <tr>
+                                        <td colspan="7" class="text-center">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Mock data - Replace with actual API calls
+        let allBookings = [];
+        let queueData = [];
+        let roomsData = [];
+
+        async function loadDashboardData() {
+            // Simulate API call
+            // In production, replace with actual API endpoints
+            
+            // Mock statistics
+            document.getElementById('totalBookings').textContent = '156';
+            document.getElementById('confirmedBookings').textContent = '45';
+            document.getElementById('queuedBookings').textContent = '12';
+            document.getElementById('cancelledBookings').textContent = '8';
+            
+            // Load rooms
+            loadRoomCapacity();
+            
+            // Load queue
+            loadQueueData();
+            
+            // Load all bookings
+            loadAllBookings();
+        }
+
+        function loadRoomCapacity() {
+            const rooms = [
+                { id: 1, name: 'Alcala Regular', capacity: 5, booked: 3 },
+                { id: 2, name: 'Justine Regular', capacity: 5, booked: 5 },
+                { id: 3, name: 'Xu Regular', capacity: 5, booked: 2 },
+                { id: 4, name: 'Lafuente Regular', capacity: 5, booked: 4 },
+                { id: 5, name: 'Alcala Villa', capacity: 5, booked: 1 },
+                { id: 6, name: 'Justine Villa', capacity: 5, booked: 3 },
+                { id: 7, name: 'Xu Villa', capacity: 5, booked: 2 },
+                { id: 8, name: 'Lafuente Villa', capacity: 5, booked: 1 }
+            ];
+            
+            const container = document.getElementById('roomCapacityContainer');
+            const filterRoom = document.getElementById('filterRoom');
+            
+            container.innerHTML = rooms.map(room => {
+                const percentage = (room.booked / room.capacity) * 100;
+                const progressClass = percentage >= 100 ? 'bg-danger' : percentage >= 80 ? 'bg-warning' : 'bg-success';
+                
+                filterRoom.innerHTML += `<option value="${room.id}">${room.name}</option>`;
+                
+                return `
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>${room.name}</span>
+                            <span>${room.booked}/${room.capacity}</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar ${progressClass}" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function loadQueueData() {
+            const queue = [
+                { position: 1, bookingId: 'BK-2025-001', guest: 'John Doe', room: 'Justine Regular', checkin: '2025-10-15', checkout: '2025-10-17', created: '2025-10-05' },
+                { position: 2, bookingId: 'BK-2025-002', guest: 'Jane Smith', room: 'Justine Regular', checkin: '2025-10-16', checkout: '2025-10-18', created: '2025-10-05' },
+                { position: 1, bookingId: 'BK-2025-003', guest: 'Bob Johnson', room: 'Lafuente Regular', checkin: '2025-10-20', checkout: '2025-10-22', created: '2025-10-06' }
+            ];
+            
+            const tbody = document.getElementById('queueTableBody');
+            tbody.innerHTML = queue.map(q => `
+                <tr>
+                    <td><span class="badge queue-badge bg-warning">#${q.position}</span></td>
+                    <td><strong>${q.bookingId}</strong></td>
+                    <td>${q.guest}</td>
+                    <td>${q.room}</td>
+                    <td>${q.checkin}</td>
+                    <td>${q.checkout}</td>
+                    <td>${q.created}</td>
+                    <td>
+                        <button class="btn btn-sm btn-success action-btn" onclick="promoteBooking('${q.bookingId}')">
+                            <i class="bi bi-arrow-up"></i> Promote
+                        </button>
+                        <button class="btn btn-sm btn-danger action-btn" onclick="cancelBooking('${q.bookingId}')">
+                            <i class="bi bi-x"></i> Cancel
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function loadAllBookings() {
+            const bookings = [
+                { id: 'BK-2025-010', guest: 'Alice Brown', room: 'Alcala Villa', dates: 'Oct 10-12', total: 9998, status: 'Confirmed' },
+                { id: 'BK-2025-011', guest: 'Charlie Wilson', room: 'Xu Regular', dates: 'Oct 15-17', total: 5998, status: 'Confirmed' },
+                { id: 'BK-2025-012', guest: 'David Lee', room: 'Justine Villa', dates: 'Oct 20-22', total: 15998, status: 'Queued' },
+                { id: 'BK-2025-013', guest: 'Emma Davis', room: 'Lafuente Regular', dates: 'Oct 12-14', total: 6998, status: 'Confirmed' }
+            ];
+            
+            const tbody = document.getElementById('bookingsTableBody');
+            tbody.innerHTML = bookings.map(b => {
+                const statusClass = b.status === 'Confirmed' ? 'success' : b.status === 'Queued' ? 'warning' : 'danger';
+                return `
+                    <tr>
+                        <td><strong>${b.id}</strong></td>
+                        <td>${b.guest}</td>
+                        <td>${b.room}</td>
+                        <td>${b.dates}</td>
+                        <td>₱${b.total.toLocaleString()}</td>
+                        <td><span class="badge bg-${statusClass}">${b.status}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-info action-btn" onclick="viewDetails('${b.id}')">
+                                <i class="bi bi-eye"></i> View
+                            </button>
+                            ${b.status !== 'Cancelled' ? `
+                            <button class="btn btn-sm btn-danger action-btn" onclick="cancelBooking('${b.id}')">
+                                <i class="bi bi-x"></i> Cancel
+                            </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function promoteBooking(bookingId) {
+            if (confirm(`Promote booking ${bookingId} to Confirmed status?`)) {
+                alert(`Booking ${bookingId} promoted to Confirmed!\n\nThe guest will be notified via email.`);
+                refreshData();
+            }
+        }
+
+        function cancelBooking(bookingId) {
+            if (confirm(`Are you sure you want to cancel booking ${bookingId}?`)) {
+                alert(`Booking ${bookingId} cancelled!\n\nQueue positions will be automatically updated.`);
+                refreshData();
+            }
+        }
+
+        function viewDetails(bookingId) {
+            alert(`View details for ${bookingId}\n\nThis would open a detailed view modal.`);
+        }
+
+        function filterQueue() {
+            const roomFilter = document.getElementById('filterRoom').value;
+            alert(`Filter queue by room: ${roomFilter || 'All'}`);
+            loadQueueData();
+        }
+
+        function filterBookings() {
+            const statusFilter = document.getElementById('filterStatus').value;
+            alert(`Filter bookings by status: ${statusFilter || 'All'}`);
+            loadAllBookings();
+        }
+
+        function refreshData() {
+            loadDashboardData();
+            alert('Dashboard data refreshed!');
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', loadDashboardData);
+    </script>
+</body>
+</html>  

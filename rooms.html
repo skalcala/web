@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooms - Sunset Beach Resort</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Merienda:wght@300..900&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <style>
+        .booking-info-card {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #ff6b35 100%);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            color: white;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+        .no-rooms-message {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .no-rooms-message i {
+            font-size: 64px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Placeholder -->
+    <div id="header-placeholder"></div>
+
+    <!-- Rooms Page Content -->
+    <div class="my-5 px-4">
+        <h2 class="fw-bold h-font text-center">OUR ROOMS</h2>
+        <div class="h-line bg-dark"></div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <!-- Filters Sidebar -->
+            <div class="col-lg-3 col-md-12 mb-lg-0 mb-4 px-0">
+                <!-- Booking Info Card -->
+                <div id="bookingInfoCard" style="display: none;" class="booking-info-card mb-3">
+                    <h6 class="mb-3"><i class="bi bi-calendar-check me-2"></i>Your Booking Details</h6>
+                    <div class="info-item">
+                        <span>Check-in:</span>
+                        <strong id="displayCheckin">-</strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Check-out:</span>
+                        <strong id="displayCheckout">-</strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Duration:</span>
+                        <strong id="displayDays">-</strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Guests:</span>
+                        <strong id="displayGuests">-</strong>
+                    </div>
+                    <button class="btn btn-sm btn-light w-100 mt-3" onclick="window.location.href='index.html'">
+                        <i class="bi bi-pencil me-2"></i>Modify Dates
+                    </button>
+                </div>
+                <nav class="navbar navbar-expand-lg rounded shadow sidebar-white">
+                    <div class="container-fluid flex-lg-column align-items-stretch">
+                        <h4 class="mt-2">FILTERS</h4>
+                        <!-- Date Filter -->
+                        <div class="border bg-light p-3 rounded mb-3">
+                            <h6 class="mb-3">Booking Dates</h6>
+                            <div class="mb-2">
+                                <label for="filterCheckin" class="form-label">Check-in</label>
+                                <input type="date" id="filterCheckin" class="form-control shadow-none" onchange="validateDates()">
+                                <div id="filterCheckinError" class="error-message"></div>
+                            </div>
+                            <div class="mb-2">
+                                <label for="filterCheckout" class="form-label">Check-out</label>
+                                <input type="date" id="filterCheckout" class="form-control shadow-none" onchange="validateDates()">
+                                <div id="filterCheckoutError" class="error-message"></div>
+                            </div>
+                        </div>
+                        <button class="navbar-toggler shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#filterDropdown">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse flex-column align-items-stretch mt-2" id="filterDropdown">
+                            
+                              <!-- Price Range Filter -->
+                            <div class="border bg-light p-3 rounded mb-3">
+                                <h6 class="mb-3">Price Range</h6>
+                                <div class="mb-2">
+                                    <label for="minPrice" class="form-label">Min: ₱<span id="minPriceValue">0</span></label>
+                                    <input type="range" class="form-range" id="minPrice" min="0" max="10000" step="500" value="0" oninput="updatePriceRange()">
+                                </div>
+                                <div class="mb-2">
+                                    <label for="maxPrice" class="form-label">Max: ₱<span id="maxPriceValue">10000</span></label>
+                                    <input type="range" class="form-range" id="maxPrice" min="0" max="10000" step="500" value="10000" oninput="updatePriceRange()">
+                                </div>
+                            </div>
+
+                            <div class="border bg-light p-3 rounded mb-3">
+                                <h6 class="mb-3">Services</h6>
+                                <div class="mb-2">
+                                    <input type="checkbox" class="form-check-input service-filter" value="wifi" id="f_wifi">
+                                    <label class="form-check-label" for="f_wifi">Wi-Fi</label>
+                                </div>
+                                <div class="mb-2">
+                                    <input type="checkbox" class="form-check-input service-filter" value="tv" id="f_tv">
+                                    <label class="form-check-label" for="f_tv">Television</label>
+                                </div>
+                                <div class="mb-2">
+                                    <input type="checkbox" class="form-check-input service-filter" value="breakfast" id="f_breakfast">
+                                    <label class="form-check-label" for="f_breakfast">Breakfast</label>
+                                </div>
+                                <div class="mb-2">
+                                    <input type="checkbox" class="form-check-input service-filter" value="pool" id="f_pool">
+                                    <label class="form-check-label" for="f_pool">Swimming Pool</label>
+                                </div>
+                            </div>
+                            <div class="border bg-light p-3 rounded mb-3">
+                                <h4 class="mb-3" style="font-size: 18px;">GUESTS</h4>
+                                <div class="d-flex">
+                                    <div class="me-3" style="flex:1;">
+                                        <label class="form-label" for="filterAdults">Adults</label>
+                                        <input id="filterAdults" type="number" min="0" class="form-control shadow-none mb-3" placeholder="e.g. 2">
+                                    </div>
+                                    <div style="flex:1;">
+                                        <label class="form-label" for="filterChildren">Children</label>
+                                        <input id="filterChildren" type="number" min="0" class="form-control shadow-none mb-3" placeholder="e.g. 1">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between p-3">
+                                <button class="btn btn-sm text-white shadow-none" style="background-color: white; color: var(--primary-color) !important; border: 1px solid var(--primary-color);" onclick="applyFilters()">Apply</button>
+                                <button class="btn btn-sm shadow-none" style="background-color: white; color: #6c757d; border: 1px solid #6c757d;" onclick="resetFilters()">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Rooms List -->
+            <div class="col-lg-9 col-md-12 px-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="mb-0">Available Rooms</h5>
+                        <small class="text-muted" id="resultsCount">Showing 8 rooms</small>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <input type="text" id="roomSearch" class="form-control shadow-none me-2" placeholder="Search rooms..." style="max-width:360px;" oninput="applyFilters()">
+                    <select id="roomSort" class="form-select shadow-none" style="max-width:200px;" onchange="sortRooms()">
+                        <option value="default">Sort: Recommended</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                    </select>
+                </div>
+                <div id="roomsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="loadComponents.js"></script>
+    <script src="app.js"></script>
+    <script>
+        const roomsData = [
+            {id: 1, name: 'Alcala Regular', price: 1499, capacity: 5, adults: 5, children: 4, image: 'images/rooms/1.jpg', facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service'], services: ['wifi', 'tv', 'breakfast']},
+            {id: 2, name: 'Justine Regular', price: 1999, capacity: 5, adults: 5, children: 4, image: 'images/rooms/2.png', facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service'], services: ['wifi', 'tv', 'breakfast']},
+            {id: 3, name: 'Xu Regular', price: 2999, capacity: 5, adults: 5, children: 4, image: 'images/rooms/3.png', facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service'], services: ['wifi', 'tv', 'breakfast']},
+            {id: 4, name: 'Lafuente Regular', price: 3499, capacity: 5, adults: 5, children: 4, image: 'images/rooms/4.png', facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service'], services: ['wifi', 'tv', 'breakfast']},
+            {id: 5, name: 'Alcala Villa', price: 4999, capacity: 5, adults: 5, children: 4, image: 'images/rooms/alcalavilla.png', facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service', 'Swimming Pool'], services: ['wifi', 'tv', 'breakfast', 'pool']},
+            {id: 6, name: 'Justine Villa', price: 7999, capacity: 5, adults: 5, children: 4, image: 'images/rooms/xuvilla.png', facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service', 'Swimming Pool'], services: ['wifi', 'tv', 'breakfast', 'pool']},
+            {id: 7, name: 'Xu Villa', price: 8999, capacity: 5, adults: 5, children: 4, image: 'images/rooms/110.png', facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service', 'Swimming Pool', 'Spa'], services: ['wifi', 'tv', 'breakfast', 'pool']},
+            {id: 8, name: 'Lafuente Villa', price: 9999, capacity: 5, adults: 5, children: 4, image: 'images/rooms/laf.png', facilities: ['Wifi', 'Television', 'Breakfast', 'Room Service', 'Swimming Pool', 'Spa', 'Gym'], services: ['wifi', 'tv', 'breakfast', 'pool']},
+        ];
+
+        let filteredRooms = [...roomsData];
+        let currentSort = 'default';
+        let bookingData = null;
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function loadBookingData() {
+            const storedData = sessionStorage.getItem('bookingData');
+            if (storedData) {
+                bookingData = JSON.parse(storedData);
+                
+                document.getElementById('bookingInfoCard').style.display = 'block';
+                document.getElementById('displayCheckin').textContent = formatDate(bookingData.checkin);
+                document.getElementById('displayCheckout').textContent = formatDate(bookingData.checkout);
+                document.getElementById('displayDays').textContent = `${bookingData.days} night${bookingData.days > 1 ? 's' : ''}`;
+                document.getElementById('displayGuests').textContent = `${bookingData.adults} adult${bookingData.adults > 1 ? 's' : ''}, ${bookingData.children} child${bookingData.children !== 1 ? 'ren' : ''}`;
+                
+                document.getElementById('filterCheckin').value = bookingData.checkin;
+                document.getElementById('filterCheckout').value = bookingData.checkout;
+                
+                document.getElementById('filterCheckin').setAttribute('min', new Date().toISOString().split('T')[0]);
+                document.getElementById('filterCheckout').setAttribute('min', bookingData.checkin);
+            } else {
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('filterCheckin').setAttribute('min', today);
+                document.getElementById('filterCheckout').setAttribute('min', today);
+            }
+        }
+
+        function validateDates() {
+            const checkin = document.getElementById('filterCheckin').value;
+            const checkout = document.getElementById('filterCheckout').value;
+            
+            document.getElementById('filterCheckinError').textContent = '';
+            document.getElementById('filterCheckoutError').textContent = '';
+            
+            if (checkin && checkout) {
+                const checkinDate = new Date(checkin);
+                const checkoutDate = new Date(checkout);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                if (checkinDate < today) {
+                    document.getElementById('filterCheckinError').textContent = 'Cannot be in the past';
+                    return false;
+                }
+                
+                if (checkoutDate <= checkinDate) {
+                    document.getElementById('filterCheckoutError').textContent = 'Must be after check-in';
+                    return false;
+                }
+                
+                document.getElementById('filterCheckout').setAttribute('min', checkin);
+            }
+            
+            updateFilterCount();
+            return true;
+        }
+
+        function renderRoomCard(room) {
+            const totalPrice = bookingData ? (room.price * bookingData.days).toLocaleString() : room.price.toLocaleString();
+            const priceLabel = bookingData ? `₱${totalPrice} total (${bookingData.days} night${bookingData.days > 1 ? 's' : ''})` : `₱${room.price.toLocaleString()} per night`;
+            
+            return `
+                <div class="card mb-4 border-o shadow room-card" data-name="${room.name}" data-price="${room.price}" data-services="${room.services.join(',')}" data-adults="${room.adults}" data-children="${room.children}"> 
+                    <div class="row g-0 p-3 align-items-center">
+                        <div class="col-md-5 mb-lg-0 mb-md-0 mb-3">
+                            <img src="${room.image}" class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-5 px-lg-3 px-md-3 px-0">
+                            <h5 class="mb-3">${room.name}</h5>
+                            <div class="features mb-3"> 
+                                <h6 class="mb-1">Features</h6>
+                                <span class="badge rounded-pill bg-light text-dark text-wrap lh-base">
+                                    <i class="bi bi-door-closed me-1"></i>1 Room
+                                </span>
+                                <span class="badge rounded-pill bg-light text-dark text-wrap lh-base">
+                                    <i class="bi bi-badge-wc me-1"></i>1 Bathroom
+                                </span>
+                                <span class="badge rounded-pill bg-light text-dark text-wrap lh-base">
+                                    <i class="bi bi-house-door me-1"></i>1 Balcony
+                                </span>
+                                <span class="badge rounded-pill bg-light text-dark text-wrap lh-base">
+                                    <i class="bi bi-couch me-1"></i>1 Sofa
+                                </span>
+                                <span class="badge rounded-pill bg-light text-dark text-wrap lh-base">
+                                    <i class="bi bi-cup-hot me-1"></i>1 Kitchen
+                                </span>
+                            </div>
+
+                            <div class="facilities mb-3"> 
+                                <h6 class="mb-1">Facilities</h6>
+                                ${room.facilities.map(f => {
+                                    const icons = {
+                                        'Wifi': 'bi-wifi',
+                                        'Television': 'bi-television',
+                                        'Breakfast': 'bi-cup-straw',
+                                        'Room Service': 'bi-people',
+                                        'Swimming Pool': 'bi-water',
+                                        'Spa': 'bi-heart',
+                                        'Gym': 'bi-heart-pulse'
+                                    };
+                                    return `<span class="badge rounded-pill bg-light text-dark text-wrap lh-base">
+                                        <i class="bi ${icons[f] || 'bi-check-circle'} me-1"></i>${f}
+                                    </span>`;
+                                }).join('')}
+                            </div>
+                            <div class="guests"> 
+                                <h6 class="mb-1">Guests</h6>
+                                <span class="badge rounded-pill bg-light text-dark text-wrap lh-base">
+                                    <i class="bi bi-person me-1"></i>${room.adults} Adults
+                                </span>
+                                <span class="badge rounded-pill bg-light text-dark text-wrap lh-base">
+                                    <i class="bi bi-person me-1"></i>${room.children} Children
+                                </span>
+                            </div>
+                        </div>
+                      <div class="col-md-2 text-align-center">
+    <h6 class="mb-4">${priceLabel}</h6>
+    <a href="booking.html?room_id=${room.id}" class="btn btn-sm w-100 btn-primary shadow-none mb-2" style="background-color: #003355; border-color: #003355;">Book Now</a>
+    <a href="room_details.html?id=${room.id}" class="btn btn-sm w-100 btn-outline-primary shadow-none" style="color: #003355; border-color: #003355;">More Details</a>
+</div>
+
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderNoRooms() {
+            return `
+                <div class="no-rooms-message">
+                    <i class="bi bi-search"></i>
+                    <h4 class="mt-3">No rooms found</h4>
+                    <p>Try adjusting your filters or search terms</p>
+                    <button class="btn btn-primary" onclick="resetFilters()">Clear All Filters</button>
+                </div>
+            `;
+        }
+
+        function renderAllRooms() {
+            const roomsList = document.getElementById('roomsList');
+            if (filteredRooms.length === 0) {
+                roomsList.innerHTML = renderNoRooms();
+            } else {
+                roomsList.innerHTML = filteredRooms.map(room => renderRoomCard(room)).join('');
+            }
+            updateResultsCount();
+        }
+
+        function updateResultsCount() {
+            const count = filteredRooms.length;
+            document.getElementById('resultsCount').textContent = `Showing ${count} room${count !== 1 ? 's' : ''}`;
+        }
+
+        function updateFilterCount() {
+            const serviceCount = document.querySelectorAll('.service-filter:checked').length;
+            const typeCount = document.querySelectorAll('.type-filter:checked').length;
+            const minPrice = parseInt(document.getElementById('minPrice').value);
+            const maxPrice = parseInt(document.getElementById('maxPrice').value);
+            const priceChanged = minPrice > 0 || maxPrice < 10000;
+            const checkin = document.getElementById('filterCheckin').value;
+            const checkout = document.getElementById('filterCheckout').value;
+            const datesSet = checkin && checkout;
+            
+            const totalFilters = serviceCount + typeCount + (priceChanged ? 1 : 0) + (datesSet ? 1 : 0);
+            document.getElementById('filterCount').textContent = totalFilters;
+        }
+
+       function updatePriceRange() {
+            let minPrice = parseInt(document.getElementById('minPrice').value);
+            let maxPrice = parseInt(document.getElementById('maxPrice').value);
+            
+            if (minPrice > maxPrice) {
+                minPrice = maxPrice;
+                document.getElementById('minPrice').value = minPrice;
+            }
+            
+            document.getElementById('minPriceValue').textContent = minPrice.toLocaleString();
+            document.getElementById('maxPriceValue').textContent = maxPrice.toLocaleString();
+            
+            updateFilterCount();
+        }
+
+        function applyFilters() {
+            if (!validateDates()) {
+                return;
+            }
+            
+            // Update booking data if dates are set
+            const checkin = document.getElementById('filterCheckin').value;
+            const checkout = document.getElementById('filterCheckout').value;
+            const filterAdults = parseInt(document.getElementById('filterAdults').value) || 0;
+            const filterChildren = parseInt(document.getElementById('filterChildren').value) || 0;
+            
+            if (checkin && checkout) {
+                const checkinDate = new Date(checkin);
+                const checkoutDate = new Date(checkout);
+                const days = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
+                
+                bookingData = {
+                    checkin: checkin,
+                    checkout: checkout,
+                    days: days,
+                    adults: filterAdults || (bookingData ? bookingData.adults : 1),
+                    children: filterChildren || (bookingData ? bookingData.children : 0),
+                    totalGuests: (filterAdults || (bookingData ? bookingData.adults : 1)) + (filterChildren || (bookingData ? bookingData.children : 0))
+                };
+                
+                // Update the booking info card
+                document.getElementById('bookingInfoCard').style.display = 'block';
+                document.getElementById('displayCheckin').textContent = formatDate(bookingData.checkin);
+                document.getElementById('displayCheckout').textContent = formatDate(bookingData.checkout);
+                document.getElementById('displayDays').textContent = `${bookingData.days} night${bookingData.days > 1 ? 's' : ''}`;
+                document.getElementById('displayGuests').textContent = `${bookingData.adults} adult${bookingData.adults > 1 ? 's' : ''}, ${bookingData.children} child${bookingData.children !== 1 ? 'ren' : ''}`;
+                
+                // Save to sessionStorage
+                sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
+            }
+            
+            const search = document.getElementById('roomSearch').value.toLowerCase().trim();
+            const selectedServices = Array.from(document.querySelectorAll('.service-filter:checked')).map(cb => cb.value);
+            const minPrice = parseInt(document.getElementById('minPrice').value);
+            const maxPrice = parseInt(document.getElementById('maxPrice').value);
+            
+            filteredRooms = roomsData.filter(room => {
+                const matchesSearch = !search || 
+                    room.name.toLowerCase().includes(search) || 
+                    room.facilities.some(f => f.toLowerCase().includes(search));
+                
+                const matchesServices = selectedServices.length === 0 || 
+                    selectedServices.every(s => room.services.includes(s));
+                
+                const matchesPrice = room.price >= minPrice && room.price <= maxPrice;
+                
+                // Filter by guest capacity
+                const matchesGuests = !bookingData || bookingData.totalGuests <= room.capacity;
+                
+                return matchesSearch && matchesServices && matchesPrice && matchesGuests;
+            });
+            
+            applySortToFiltered();
+            updateFilterCount();
+            renderAllRooms();
+        }
+
+        function resetFilters() {
+            document.getElementById('roomSearch').value = '';
+            document.querySelectorAll('.service-filter').forEach(cb => cb.checked = false);
+            
+            document.getElementById('minPrice').value = 0;
+            document.getElementById('maxPrice').value = 10000;
+            document.getElementById('minPriceValue').textContent = '0';
+            document.getElementById('maxPriceValue').textContent = '10,000';
+            
+            if (bookingData) {
+                document.getElementById('filterCheckin').value = bookingData.checkin;
+                document.getElementById('filterCheckout').value = bookingData.checkout;
+            } else {
+                document.getElementById('filterCheckin').value = '';
+                document.getElementById('filterCheckout').value = '';
+            }
+            
+            document.getElementById('filterAdults').value = '';
+            document.getElementById('filterChildren').value = '';
+            
+            document.getElementById('filterCheckinError').textContent = '';
+            document.getElementById('filterCheckoutError').textContent = '';
+            
+            document.getElementById('roomSort').value = 'default';
+            currentSort = 'default';
+            
+            filteredRooms = [...roomsData];
+            
+            updateFilterCount();
+            renderAllRooms();
+        }
+
+        function sortRooms() {
+            currentSort = document.getElementById('roomSort').value;
+            applySortToFiltered();
+            renderAllRooms();
+        }
+
+        function applySortToFiltered() {
+            if(currentSort === 'price-asc') {
+                filteredRooms.sort((a, b) => a.price - b.price);
+            } else if(currentSort === 'price-desc') {
+                filteredRooms.sort((a, b) => b.price - a.price);
+            } else {
+                const originalOrder = roomsData.map(r => r.id);
+                filteredRooms.sort((a, b) => originalOrder.indexOf(a.id) - originalOrder.indexOf(b.id));
+            }
+        }
+
+        function openBooking(roomId) {
+            const room = roomsData.find(r => r.id === roomId);
+            if (room) {
+                if (bookingData && bookingData.totalGuests > room.capacity) {
+                    alert(`Sorry, ${room.name} has a maximum capacity of ${room.capacity} guests.\nYour booking is for ${bookingData.totalGuests} guests.\n\nPlease select a different room or modify your booking.`);
+                    return;
+                }
+                
+                let bookingMessage = `Booking ${room.name}\n`;
+                
+                if (bookingData) {
+                    const totalPrice = room.price * bookingData.days;
+                    bookingMessage += `\nCheck-in: ${formatDate(bookingData.checkin)}`;
+                    bookingMessage += `\nCheck-out: ${formatDate(bookingData.checkout)}`;
+                    bookingMessage += `\nDuration: ${bookingData.days} night${bookingData.days > 1 ? 's' : ''}`;
+                    bookingMessage += `\nGuests: ${bookingData.adults} adult${bookingData.adults > 1 ? 's' : ''}, ${bookingData.children} child${bookingData.children !== 1 ? 'ren' : ''}`;
+                    bookingMessage += `\n\nPrice per night: ₱${room.price.toLocaleString()}`;
+                    bookingMessage += `\nTotal Price: ₱${totalPrice.toLocaleString()}`;
+                } else {
+                    bookingMessage += `Price: ₱${room.price.toLocaleString()} per night`;
+                    bookingMessage += `\n\nPlease select check-in and check-out dates to see the total price.`;
+                }
+                
+                bookingMessage += `\n\nThis feature will redirect to booking page.`;
+                alert(bookingMessage);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBookingData();
+            renderAllRooms();
+            updateFilterCount();
+            
+            document.querySelectorAll('.service-filter').forEach(checkbox => {
+                checkbox.addEventListener('change', updateFilterCount);
+            });
+            
+            document.getElementById('filterCheckin').addEventListener('change', validateDates);
+            document.getElementById('filterCheckout').addEventListener('change', validateDates);
+        });
+    </script>
+</body>
+</html>
